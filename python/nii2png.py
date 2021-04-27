@@ -2,7 +2,6 @@
 """Convert 3D/4D NIfTI images into PNG slices."""
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -10,6 +9,15 @@ import nibabel
 import numpy
 
 import imageio
+
+
+def strip_nii_extension(path):
+    filename = Path(path).name
+    if filename.endswith(".nii.gz"):
+        return filename[:-7]
+    if filename.endswith(".nii"):
+        return filename[:-4]
+    return Path(path).stem
 
 
 def parse_args(argv):
@@ -26,6 +34,8 @@ def main(argv):
     args = parse_args(argv)
     inputfile = args.input
     output_dir = Path(args.output)
+
+    basename = strip_nii_extension(inputfile)
 
     print('Input file is ', inputfile)
     print('Output folder is ', str(output_dir))
@@ -86,8 +96,8 @@ def main(argv):
                             
                     #alternate slices and save as png
                     print('Saving image...')
-                    image_name = inputfile[:-4] + "_t" + "{:0>3}".format(str(current_volume+1)) + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
-                    image_path = output_dir / os.path.basename(image_name)
+                    image_name = basename + "_t" + "{:0>3}".format(str(current_volume+1)) + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
+                    image_path = output_dir / image_name
                     imageio.imwrite(image_path, data)
                     print('Saved.')
                     slice_counter += 1
@@ -128,8 +138,8 @@ def main(argv):
                 #alternate slices and save as png
                 if (slice_counter % 1) == 0:
                     print('Saving image...')
-                    image_name = inputfile[:-4] + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
-                    image_path = output_dir / os.path.basename(image_name)
+                    image_name = basename + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
+                    image_path = output_dir / image_name
                     imageio.imwrite(image_path, data)
                     print('Saved.')
                     slice_counter += 1
