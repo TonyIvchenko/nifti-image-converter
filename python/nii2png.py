@@ -20,6 +20,12 @@ def strip_nii_extension(path):
     return Path(path).stem
 
 
+def rotate_slice(data, degrees):
+    if degrees == 0:
+        return data
+    return numpy.rot90(data, k=degrees // 90)
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(
         prog="nii2png.py",
@@ -85,12 +91,10 @@ def main(argv):
                     if ask_rotate.lower() == 'y':
                         if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
                             print('Rotating image...')
-                            if ask_rotate_num == 90:
-                                data = numpy.rot90(image_array[:, :, current_slice, current_volume])
-                            elif ask_rotate_num == 180:
-                                data = numpy.rot90(numpy.rot90(image_array[:, :, current_slice, current_volume]))
-                            elif ask_rotate_num == 270:
-                                data = numpy.rot90(numpy.rot90(numpy.rot90(image_array[:, :, current_slice, current_volume])))
+                            data = rotate_slice(
+                                image_array[:, :, current_slice, current_volume],
+                                ask_rotate_num,
+                            )
                     elif ask_rotate.lower() == 'n':
                         data = image_array[:, :, current_slice, current_volume]
                             
@@ -126,12 +130,7 @@ def main(argv):
                 # rotate or no rotate
                 if ask_rotate.lower() == 'y':
                     if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
-                        if ask_rotate_num == 90:
-                            data = numpy.rot90(image_array[:, :, current_slice])
-                        elif ask_rotate_num == 180:
-                            data = numpy.rot90(numpy.rot90(image_array[:, :, current_slice]))
-                        elif ask_rotate_num == 270:
-                            data = numpy.rot90(numpy.rot90(numpy.rot90(image_array[:, :, current_slice])))
+                        data = rotate_slice(image_array[:, :, current_slice], ask_rotate_num)
                 elif ask_rotate.lower() == 'n':
                     data = image_array[:, :, current_slice]
 
