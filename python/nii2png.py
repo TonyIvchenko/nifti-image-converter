@@ -26,6 +26,16 @@ def rotate_slice(data, degrees):
     return numpy.rot90(data, k=degrees // 90)
 
 
+def normalize_to_uint8(data):
+    finite = numpy.nan_to_num(data, nan=0.0, posinf=0.0, neginf=0.0)
+    min_value = float(finite.min())
+    max_value = float(finite.max())
+    if max_value == min_value:
+        return numpy.zeros(finite.shape, dtype=numpy.uint8)
+    scaled = (finite - min_value) / (max_value - min_value)
+    return (scaled * 255).astype(numpy.uint8)
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(
         prog="nii2png.py",
@@ -102,7 +112,7 @@ def main(argv):
                     print('Saving image...')
                     image_name = basename + "_t" + "{:0>3}".format(str(current_volume+1)) + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
                     image_path = output_dir / image_name
-                    imageio.imwrite(image_path, data)
+                    imageio.imwrite(image_path, normalize_to_uint8(data))
                     print('Saved.')
                     slice_counter += 1
 
@@ -139,7 +149,7 @@ def main(argv):
                     print('Saving image...')
                     image_name = basename + "_z" + "{:0>3}".format(str(current_slice+1))+ ".png"
                     image_path = output_dir / image_name
-                    imageio.imwrite(image_path, data)
+                    imageio.imwrite(image_path, normalize_to_uint8(data))
                     print('Saved.')
                     slice_counter += 1
 
