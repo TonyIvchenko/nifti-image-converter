@@ -51,13 +51,21 @@ def main(argv):
     inputfile = args.input
     output_dir = Path(args.output)
 
+    if not Path(inputfile).is_file():
+        print(f"Input file does not exist: {inputfile}")
+        sys.exit(2)
+
     basename = strip_nii_extension(inputfile)
 
     print('Input file is ', inputfile)
     print('Output folder is ', str(output_dir))
 
     # set fn as your 3D/4D nifti file
-    image_array = nibabel.load(inputfile).get_fdata()
+    try:
+        image_array = nibabel.load(inputfile).get_fdata()
+    except Exception as exc:
+        print(f"Unable to load NIfTI file '{inputfile}': {exc}")
+        sys.exit(2)
     print(len(image_array.shape))
 
     # ask if rotate
@@ -155,7 +163,8 @@ def main(argv):
 
         print('Finished converting images')
     else:
-        print('Not a 3D or 4D Image. Please try again.')
+        print(f"Not a 3D or 4D image. Got shape {image_array.shape}.")
+        sys.exit(2)
 
 # call the function to start the program
 if __name__ == "__main__":
