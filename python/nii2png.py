@@ -43,6 +43,19 @@ def parse_args(argv):
     )
     parser.add_argument("-i", "--input", required=True, help="Path to input .nii/.nii.gz file.")
     parser.add_argument("-o", "--output", required=True, help="Path to output directory for PNG files.")
+    parser.add_argument(
+        "-r",
+        "--rotate",
+        type=int,
+        choices=[0, 90, 180, 270],
+        help="Rotate output slices by this degree value.",
+    )
+    parser.add_argument(
+        "-y",
+        "--yes",
+        action="store_true",
+        help="Run non-interactively with default answers.",
+    )
     return parser.parse_args(argv)
 
 
@@ -68,21 +81,31 @@ def main(argv):
         sys.exit(2)
     print(len(image_array.shape))
 
-    # ask if rotate
-    ask_rotate = input('Would you like to rotate the orientation? (y/n) ')
-
-    if ask_rotate.lower() == 'y':
-        ask_rotate_num = int(input('OK. By 90° 180° or 270°? '))
-        if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
-            print('Got it. Your images will be rotated by {} degrees.'.format(ask_rotate_num))
+    rotation_degrees = 0
+    if args.rotate is not None:
+        rotation_degrees = args.rotate
+        if rotation_degrees == 0:
+            print("Rotation disabled via --rotate 0.")
         else:
-            print('You must enter a value that is either 90, 180, or 270. Quitting...')
-            sys.exit()
-    elif ask_rotate.lower() == 'n':
-        print('OK, Your images will be converted it as it is.')
+            print(f"Rotation set to {rotation_degrees} degrees via --rotate.")
+    elif args.yes:
+        print("Running non-interactively with no rotation.")
     else:
-        print('You must choose either y or n. Quitting...')
-        sys.exit()
+        ask_rotate = input('Would you like to rotate the orientation? (y/n) ')
+
+        if ask_rotate.lower() == 'y':
+            ask_rotate_num = int(input('OK. By 90° 180° or 270°? '))
+            if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
+                rotation_degrees = ask_rotate_num
+                print('Got it. Your images will be rotated by {} degrees.'.format(ask_rotate_num))
+            else:
+                print('You must enter a value that is either 90, 180, or 270. Quitting...')
+                sys.exit()
+        elif ask_rotate.lower() == 'n':
+            print('OK, Your images will be converted it as it is.')
+        else:
+            print('You must choose either y or n. Quitting...')
+            sys.exit()
 
     # if 4D image inputted
     if len(image_array.shape) == 4:
@@ -106,14 +129,13 @@ def main(argv):
             for current_slice in range(0, total_slices):
                 if (slice_counter % 1) == 0:
                     # rotate or no rotate
-                    if ask_rotate.lower() == 'y':
-                        if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
-                            print('Rotating image...')
-                            data = rotate_slice(
-                                image_array[:, :, current_slice, current_volume],
-                                ask_rotate_num,
-                            )
-                    elif ask_rotate.lower() == 'n':
+                    if rotation_degrees in (90, 180, 270):
+                        print('Rotating image...')
+                        data = rotate_slice(
+                            image_array[:, :, current_slice, current_volume],
+                            rotation_degrees,
+                        )
+                    else:
                         data = image_array[:, :, current_slice, current_volume]
                             
                     #alternate slices and save as png
@@ -146,10 +168,9 @@ def main(argv):
             # alternate slices
             if (slice_counter % 1) == 0:
                 # rotate or no rotate
-                if ask_rotate.lower() == 'y':
-                    if ask_rotate_num == 90 or ask_rotate_num == 180 or ask_rotate_num == 270:
-                        data = rotate_slice(image_array[:, :, current_slice], ask_rotate_num)
-                elif ask_rotate.lower() == 'n':
+                if rotation_degrees in (90, 180, 270):
+                    data = rotate_slice(image_array[:, :, current_slice], rotation_degrees)
+                else:
                     data = image_array[:, :, current_slice]
 
                 #alternate slices and save as png
