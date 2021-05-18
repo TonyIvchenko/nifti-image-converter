@@ -61,6 +61,11 @@ def parse_args(argv):
         action="store_true",
         help="Overwrite PNG files if they already exist.",
     )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print intended output files without writing them.",
+    )
     return parser.parse_args(argv)
 
 
@@ -150,6 +155,9 @@ def main(argv):
                     if image_path.exists() and not args.overwrite:
                         print(f"Skipping existing file: {image_path}")
                         continue
+                    if args.dry_run:
+                        print(f"Would write: {image_path}")
+                        continue
                     imageio.imwrite(image_path, normalize_to_uint8(data))
                     print('Saved.')
                     slice_counter += 1
@@ -188,6 +196,9 @@ def main(argv):
                     image_path = output_dir / image_name
                     if image_path.exists() and not args.overwrite:
                         print(f"Skipping existing file: {image_path}")
+                        continue
+                    if args.dry_run:
+                        print(f"Would write: {image_path}")
                         continue
                     imageio.imwrite(image_path, normalize_to_uint8(data))
                     print('Saved.')
