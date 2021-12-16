@@ -82,3 +82,23 @@ def test_iter_slices_for_4d_returns_volume_and_slice_indices():
 
     last_volume, last_slice, _ = slices[-1]
     assert (last_volume, last_slice) == (2, 3)
+
+
+def test_build_manifest_captures_run_metadata():
+    manifest = nii2png.build_manifest(
+        input_path="scan.nii.gz",
+        output_dir="png",
+        image_shape=(8, 9, 10),
+        axis="z",
+        rotate=90,
+        dry_run=True,
+        records=[{"slice_index": 1, "status": "dry_run", "path": "png/scan_z001.png", "volume_index": None}],
+    )
+
+    assert manifest["input_path"] == "scan.nii.gz"
+    assert manifest["output_dir"] == "png"
+    assert manifest["image_shape"] == [8, 9, 10]
+    assert manifest["axis"] == "z"
+    assert manifest["rotate"] == 90
+    assert manifest["dry_run"] is True
+    assert len(manifest["records"]) == 1

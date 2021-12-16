@@ -2,6 +2,7 @@
 """Convert 3D/4D NIfTI images into PNG slices."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -116,7 +117,31 @@ def parse_args(argv):
         default="z",
         help="Spatial axis to slice along.",
     )
+    parser.add_argument(
+        "--manifest-json",
+        help="Optional path to write a JSON manifest describing produced slice files.",
+    )
     return parser.parse_args(argv)
+
+
+def build_manifest(
+    input_path,
+    output_dir,
+    image_shape,
+    axis,
+    rotate,
+    dry_run,
+    records,
+):
+    return {
+        "input_path": str(input_path),
+        "output_dir": str(output_dir),
+        "image_shape": list(image_shape),
+        "axis": axis,
+        "rotate": rotate,
+        "dry_run": dry_run,
+        "records": records,
+    }
 
 
 def main(argv):
@@ -182,6 +207,7 @@ def main(argv):
     written_count = 0
     skipped_count = 0
     preview_count = 0
+    records = []
 
     try:
         slices = iter_slices(image_array, axis=args.axis)
@@ -201,17 +227,56 @@ def main(argv):
             if image_path.exists() and not args.overwrite:
                 log(f"Skipping existing file: {image_path}")
                 skipped_count += 1
+                records.append(
+                    {
+                        "volume_index": volume_index,
+                        "slice_index": slice_index,
+                        "path": str(image_path),
+                        "status": "skipped_existing",
+                    }
+                )
                 continue
             if args.dry_run:
                 log(f"Would write: {image_path}")
                 preview_count += 1
+                records.append(
+                    {
+                        "volume_index": volume_index,
+                        "slice_index": slice_index,
+                        "path": str(image_path),
+                        "status": "dry_run",
+                    }
+                )
                 continue
             imageio.imwrite(image_path, normalize_to_uint8(slice_data))
             written_count += 1
+            records.append(
+                {
+                    "volume_index": volume_index,
+                    "slice_index": slice_index,
+                    "path": str(image_path),
+                    "status": "written",
+                }
+            )
             log('Saved.')
     except ValueError as exc:
         print(str(exc))
         sys.exit(2)
+
+    if args.manifest_json:
+        manifest_path = Path(args.manifest_json)
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest = build_manifest(
+            input_path=inputfile,
+            output_dir=output_dir,
+            image_shape=image_array.shape,
+            axis=args.axis,
+            rotate=rotation_degrees,
+            dry_run=args.dry_run,
+            records=records,
+        )
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        log(f"Wrote manifest JSON to {manifest_path}")
 
     if args.dry_run:
         print(f"Dry run complete. {preview_count} files would be written ({skipped_count} skipped).")
