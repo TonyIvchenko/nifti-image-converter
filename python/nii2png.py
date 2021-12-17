@@ -36,14 +36,20 @@ def rotate_slice(data, degrees):
     return numpy.rot90(data, k=degrees // 90)
 
 
-def normalize_to_uint8(data):
+def normalize_to_uint8(data, min_value=None, max_value=None):
     finite = numpy.nan_to_num(data, nan=0.0, posinf=0.0, neginf=0.0)
-    min_value = float(finite.min())
-    max_value = float(finite.max())
+    if min_value is None or max_value is None:
+        min_value = float(finite.min())
+        max_value = float(finite.max())
     if max_value == min_value:
         return numpy.zeros(finite.shape, dtype=numpy.uint8)
     scaled = (finite - min_value) / (max_value - min_value)
     return (scaled * 255).astype(numpy.uint8)
+
+
+def compute_global_normalization_bounds(image_array):
+    finite = numpy.nan_to_num(image_array, nan=0.0, posinf=0.0, neginf=0.0)
+    return float(finite.min()), float(finite.max())
 
 
 def iter_slices(image_array, axis="z"):
@@ -121,6 +127,12 @@ def parse_args(argv):
         "--manifest-json",
         help="Optional path to write a JSON manifest describing produced slice files.",
     )
+    parser.add_argument(
+        "--normalize",
+        choices=["per-slice", "global"],
+        default="per-slice",
+        help="Normalization strategy for intensity scaling to uint8.",
+    )
     return parser.parse_args(argv)
 
 
@@ -131,6 +143,7 @@ def build_manifest(
     axis,
     rotate,
     dry_run,
+    normalize,
     records,
 ):
     return {
@@ -140,6 +153,7 @@ def build_manifest(
         "axis": axis,
         "rotate": rotate,
         "dry_run": dry_run,
+        "normalize": normalize,
         "records": records,
     }
 
@@ -204,6 +218,15 @@ def main(argv):
 
     log('Reading NIfTI file...')
 
+    global_min = None
+    global_max = None
+    if args.normalize == "global":
+        global_min, global_max = compute_global_normalization_bounds(image_array)
+        log(
+            "Using global normalization bounds: "
+            f"min={global_min:.6f}, max={global_max:.6f}"
+        )
+
     written_count = 0
     skipped_count = 0
     preview_count = 0
@@ -248,7 +271,10 @@ def main(argv):
                     }
                 )
                 continue
-            imageio.imwrite(image_path, normalize_to_uint8(slice_data))
+            imageio.imwrite(
+                image_path,
+                normalize_to_uint8(slice_data, min_value=global_min, max_value=global_max),
+            )
             written_count += 1
             records.append(
                 {
@@ -273,6 +299,7 @@ def main(argv):
             axis=args.axis,
             rotate=rotation_degrees,
             dry_run=args.dry_run,
+            normalize=args.normalize,
             records=records,
         )
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

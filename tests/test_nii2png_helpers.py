@@ -48,6 +48,22 @@ def test_normalize_to_uint8_handles_constant_values():
     assert np.array_equal(scaled, np.zeros((2, 2), dtype=np.uint8))
 
 
+def test_normalize_to_uint8_honors_explicit_bounds():
+    source = np.array([[10.0, 20.0], [30.0, 40.0]])
+    scaled = nii2png.normalize_to_uint8(source, min_value=10.0, max_value=40.0)
+
+    assert scaled[0, 0] == 0
+    assert scaled[1, 1] == 255
+
+
+def test_compute_global_normalization_bounds():
+    source = np.array([[0.0, np.nan], [5.0, np.inf], [-3.0, 2.0]])
+    min_value, max_value = nii2png.compute_global_normalization_bounds(source)
+
+    assert min_value == -3.0
+    assert max_value == 5.0
+
+
 def test_iter_slices_for_3d_returns_no_volume_index():
     image = np.arange(2 * 2 * 3).reshape((2, 2, 3))
 
@@ -92,6 +108,7 @@ def test_build_manifest_captures_run_metadata():
         axis="z",
         rotate=90,
         dry_run=True,
+        normalize="global",
         records=[{"slice_index": 1, "status": "dry_run", "path": "png/scan_z001.png", "volume_index": None}],
     )
 
@@ -101,4 +118,5 @@ def test_build_manifest_captures_run_metadata():
     assert manifest["axis"] == "z"
     assert manifest["rotate"] == 90
     assert manifest["dry_run"] is True
+    assert manifest["normalize"] == "global"
     assert len(manifest["records"]) == 1
