@@ -15,3 +15,7 @@ def _status_counts(records):
 
 def converter_input_path(manifest):
     return manifest.get("input_path")
+
+
+def converter_output_dir(manifest):
+    return manifest.get("output_dir")
