@@ -35,3 +35,7 @@ def test_converter_input_path():
 
 def test_converter_output_dir():
     assert manifest_helpers.converter_output_dir(_sample_manifest()) == "out"
+
+
+def test_converter_axis():
+    assert manifest_helpers.converter_axis(_sample_manifest()) == "z"
