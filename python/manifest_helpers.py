@@ -35,3 +35,7 @@ def converter_normalization(manifest):
 
 def converter_is_dry_run(manifest):
     return bool(manifest.get("dry_run"))
+
+
+def converter_image_shape(manifest):
+    return manifest.get("image_shape")
