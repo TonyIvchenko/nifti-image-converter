@@ -39,3 +39,7 @@ def converter_is_dry_run(manifest):
 
 def converter_image_shape(manifest):
     return manifest.get("image_shape")
+
+
+def converter_records(manifest):
+    return _records(manifest)
