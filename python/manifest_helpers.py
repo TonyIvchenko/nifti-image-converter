@@ -43,3 +43,7 @@ def converter_image_shape(manifest):
 
 def converter_records(manifest):
     return _records(manifest)
+
+
+def converter_record_count(manifest):
+    return len(_records(manifest))
