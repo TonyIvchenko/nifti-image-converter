@@ -47,3 +47,7 @@ def converter_records(manifest):
 
 def converter_record_count(manifest):
     return len(_records(manifest))
+
+
+def converter_written_count(manifest):
+    return sum(1 for record in _records(manifest) if record.get("status") == "written")
