@@ -63,3 +63,7 @@ def test_converter_records():
 
 def test_converter_record_count():
     assert manifest_helpers.converter_record_count(_sample_manifest()) == 6
+
+
+def test_converter_written_count():
+    assert manifest_helpers.converter_written_count(_sample_manifest()) == 2
