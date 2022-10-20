@@ -55,3 +55,7 @@ def converter_written_count(manifest):
 
 def converter_skipped_count(manifest):
     return sum(1 for record in _records(manifest) if record.get("status") == "skipped_existing")
+
+
+def converter_dry_run_count(manifest):
+    return sum(1 for record in _records(manifest) if record.get("status") == "dry_run")
