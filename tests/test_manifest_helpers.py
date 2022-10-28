@@ -75,3 +75,7 @@ def test_converter_skipped_count():
 
 def test_converter_dry_run_count():
     assert manifest_helpers.converter_dry_run_count(_sample_manifest()) == 1
+
+
+def test_converter_error_count():
+    assert manifest_helpers.converter_error_count(_sample_manifest()) == 1
