@@ -63,3 +63,7 @@ def converter_dry_run_count(manifest):
 
 def converter_error_count(manifest):
     return sum(1 for record in _records(manifest) if record.get("status") == "error")
+
+
+def converter_all_paths(manifest):
+    return [record.get("path") for record in _records(manifest) if record.get("path")]
