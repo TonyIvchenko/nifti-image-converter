@@ -67,3 +67,7 @@ def converter_error_count(manifest):
 
 def converter_all_paths(manifest):
     return [record.get("path") for record in _records(manifest) if record.get("path")]
+
+
+def converter_written_paths(manifest):
+    return [record.get("path") for record in _records(manifest) if record.get("status") == "written" and record.get("path")]
