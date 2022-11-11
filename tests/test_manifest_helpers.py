@@ -91,3 +91,7 @@ def test_converter_written_paths():
 
 def test_converter_skipped_paths():
     assert manifest_helpers.converter_skipped_paths(_sample_manifest()) == ["out/c.png"]
+
+
+def test_converter_dry_run_paths():
+    assert manifest_helpers.converter_dry_run_paths(_sample_manifest()) == ["out/d.png"]
