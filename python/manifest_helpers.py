@@ -79,3 +79,7 @@ def converter_skipped_paths(manifest):
 
 def converter_dry_run_paths(manifest):
     return [record.get("path") for record in _records(manifest) if record.get("status") == "dry_run" and record.get("path")]
+
+
+def converter_error_paths(manifest):
+    return [record.get("path") for record in _records(manifest) if record.get("status") == "error" and record.get("path")]
