@@ -83,3 +83,7 @@ def converter_dry_run_paths(manifest):
 
 def converter_error_paths(manifest):
     return [record.get("path") for record in _records(manifest) if record.get("status") == "error" and record.get("path")]
+
+
+def converter_has_records(manifest):
+    return bool(_records(manifest))
