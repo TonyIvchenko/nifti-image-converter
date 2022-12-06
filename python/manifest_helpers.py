@@ -95,3 +95,8 @@ def converter_is_empty(manifest):
 
 def converter_wrote_anything(manifest):
     return converter_written_count(manifest) > 0
+
+
+def converter_is_dry_run_only(manifest):
+    records = _records(manifest)
+    return bool(records) and all(record.get("status") == "dry_run" for record in records)
