@@ -111,3 +111,7 @@ def test_converter_is_empty():
 
 def test_converter_wrote_anything():
     assert manifest_helpers.converter_wrote_anything(_sample_manifest()) is True
+
+
+def test_converter_is_dry_run_only():
+    assert manifest_helpers.converter_is_dry_run_only(_sample_manifest()) is False
