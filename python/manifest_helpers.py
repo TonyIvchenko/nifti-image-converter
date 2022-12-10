@@ -100,3 +100,8 @@ def converter_wrote_anything(manifest):
 def converter_is_dry_run_only(manifest):
     records = _records(manifest)
     return bool(records) and all(record.get("status") == "dry_run" for record in records)
+
+
+def converter_has_duplicate_paths(manifest):
+    paths = converter_all_paths(manifest)
+    return len(paths) != len(set(paths))
