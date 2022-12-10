@@ -115,3 +115,7 @@ def test_converter_wrote_anything():
 
 def test_converter_is_dry_run_only():
     assert manifest_helpers.converter_is_dry_run_only(_sample_manifest()) is False
+
+
+def test_converter_has_duplicate_paths():
+    assert manifest_helpers.converter_has_duplicate_paths(_sample_manifest()) is True
