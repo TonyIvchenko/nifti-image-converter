@@ -112,3 +112,7 @@ def converter_duplicate_paths(manifest):
     for path in converter_all_paths(manifest):
         counts[path] = counts.get(path, 0) + 1
     return sorted([path for path, count in counts.items() if count > 1])
+
+
+def converter_unique_path_count(manifest):
+    return len(set(converter_all_paths(manifest)))
