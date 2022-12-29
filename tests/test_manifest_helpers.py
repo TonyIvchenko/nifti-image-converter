@@ -123,3 +123,7 @@ def test_converter_has_duplicate_paths():
 
 def test_converter_duplicate_paths():
     assert manifest_helpers.converter_duplicate_paths(_sample_manifest()) == ["out/e.png"]
+
+
+def test_converter_unique_path_count():
+    assert manifest_helpers.converter_unique_path_count(_sample_manifest()) == 5
