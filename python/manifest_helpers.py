@@ -120,3 +120,13 @@ def converter_unique_path_count(manifest):
 
 def converter_status_counts(manifest):
     return _status_counts(_records(manifest))
+
+
+def converter_unknown_statuses(manifest, known_statuses=None):
+    if known_statuses is None:
+        known_statuses = {"written", "skipped_existing", "dry_run", "error"}
+    return sorted(
+        status
+        for status in converter_status_counts(manifest)
+        if status not in known_statuses
+    )
