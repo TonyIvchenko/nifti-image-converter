@@ -127,3 +127,13 @@ def test_converter_duplicate_paths():
 
 def test_converter_unique_path_count():
     assert manifest_helpers.converter_unique_path_count(_sample_manifest()) == 5
+
+
+def test_converter_status_counts():
+    assert manifest_helpers.converter_status_counts(_sample_manifest()) == {
+        "written": 2,
+        "skipped_existing": 1,
+        "dry_run": 1,
+        "error": 1,
+        "weird": 1,
+    }
