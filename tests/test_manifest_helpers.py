@@ -145,3 +145,7 @@ def test_converter_unknown_statuses():
 
 def test_converter_slice_indices():
     assert manifest_helpers.converter_slice_indices(_sample_manifest()) == [1, 2, 4, 5, 6, 7]
+
+
+def test_converter_volume_indices():
+    assert manifest_helpers.converter_volume_indices(_sample_manifest()) == [1, 1, 1, 2, 2, 2]
