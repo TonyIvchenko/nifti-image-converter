@@ -138,3 +138,11 @@ def converter_slice_indices(manifest):
         for index in (record.get("slice_index") for record in _records(manifest))
         if isinstance(index, int)
     )
+
+
+def converter_volume_indices(manifest):
+    return sorted(
+        index
+        for index in (record.get("volume_index") for record in _records(manifest))
+        if isinstance(index, int)
+    )
