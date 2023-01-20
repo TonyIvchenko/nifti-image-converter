@@ -146,3 +146,8 @@ def converter_volume_indices(manifest):
         for index in (record.get("volume_index") for record in _records(manifest))
         if isinstance(index, int)
     )
+
+
+def converter_max_slice_index(manifest):
+    indices = converter_slice_indices(manifest)
+    return max(indices) if indices else None
