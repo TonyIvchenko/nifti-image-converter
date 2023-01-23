@@ -149,3 +149,7 @@ def test_converter_slice_indices():
 
 def test_converter_volume_indices():
     assert manifest_helpers.converter_volume_indices(_sample_manifest()) == [1, 1, 1, 2, 2, 2]
+
+
+def test_converter_max_slice_index():
+    assert manifest_helpers.converter_max_slice_index(_sample_manifest()) == 7
