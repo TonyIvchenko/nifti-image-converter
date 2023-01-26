@@ -151,3 +151,8 @@ def converter_volume_indices(manifest):
 def converter_max_slice_index(manifest):
     indices = converter_slice_indices(manifest)
     return max(indices) if indices else None
+
+
+def converter_min_slice_index(manifest):
+    indices = converter_slice_indices(manifest)
+    return min(indices) if indices else None
