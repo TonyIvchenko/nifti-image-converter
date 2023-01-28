@@ -157,3 +157,7 @@ def test_converter_max_slice_index():
 
 def test_converter_min_slice_index():
     assert manifest_helpers.converter_min_slice_index(_sample_manifest()) == 1
+
+
+def test_converter_missing_slice_indices():
+    assert manifest_helpers.converter_missing_slice_indices(_sample_manifest()) == [3]
