@@ -166,3 +166,8 @@ def converter_missing_slice_indices(manifest):
     hi = max(indices)
     existing = set(indices)
     return [index for index in range(lo, hi + 1) if index not in existing]
+
+
+def converter_first_record(manifest):
+    records = _records(manifest)
+    return records[0] if records else None
