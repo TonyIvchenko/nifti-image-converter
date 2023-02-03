@@ -171,3 +171,8 @@ def converter_missing_slice_indices(manifest):
 def converter_first_record(manifest):
     records = _records(manifest)
     return records[0] if records else None
+
+
+def converter_last_record(manifest):
+    records = _records(manifest)
+    return records[-1] if records else None
