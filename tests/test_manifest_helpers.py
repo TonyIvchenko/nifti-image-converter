@@ -161,3 +161,7 @@ def test_converter_min_slice_index():
 
 def test_converter_missing_slice_indices():
     assert manifest_helpers.converter_missing_slice_indices(_sample_manifest()) == [3]
+
+
+def test_converter_first_record():
+    assert manifest_helpers.converter_first_record(_sample_manifest())["status"] == "written"
